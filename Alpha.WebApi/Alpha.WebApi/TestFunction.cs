@@ -7,13 +7,17 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Text.Json;
+using Alpha.Common.Enums;
+using Alpha.Common.Models;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Alpha.WebApi
 {
-    public static class TestFunction
+    public class TestFunction : FunctionBase
     {
-        [FunctionName("TestFunction")]
-        public static async Task<IActionResult> Run(
+        [FunctionName(nameof(RunTest))]
+        public static async Task<IActionResult> RunTest(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -30,6 +34,27 @@ namespace Alpha.WebApi
                 : $"Hello, {name}. This HTTP triggered function executed successfully.";
 
             return new OkObjectResult(responseMessage);
+        }
+
+        [FunctionName(nameof(PostTest))]
+        public async Task<IActionResult> PostTest([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
+            HttpRequest req, ILogger log)
+        {
+            try
+            {
+                var requestBody = new StreamReader(req.Body).ReadToEnd();
+
+                var data = JsonSerializer.Deserialize<TestModel>(requestBody);
+
+                log.LogInformation($"Data received, {data.Name}");
+
+                return new OkObjectResult(true);
+            }
+            catch (Exception ex)
+            {
+                var errorModel = CreateLogError(ex.TargetSite.Name, ErrorCodeEnum.InternalServerError, ex.Message, log);
+                return new BadRequestObjectResult(errorModel);
+            }
         }
     }
 }
