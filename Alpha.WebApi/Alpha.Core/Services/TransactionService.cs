@@ -25,30 +25,31 @@ namespace Alpha.Core.Services
             // this probably needs to be redesigned to be wrapped in a database transaction
             try
             {
+                int securityId;
+                int holdingId;
+
                 // check if this security is already in the database
-                var securityId = await securityRepository.CheckSecurityExists(transaction.Symbol);
+                securityId = await securityRepository.CheckSecurityExists(transaction.Symbol);
 
                 // if no, add it
-                if (!securityId.Item1)
+                if (securityId is 0)
                 {
-                    // add to db
+                    securityId = await securityRepository.AddSecurity(transaction.Symbol, transaction.Description);
                 }
 
                 // add the transaction
-                var success = await transactionRepository.AddTransactionAsync(transaction, securityId.Item2);
+                await transactionRepository.AddTransactionAsync(transaction, securityId);
 
                 // is this holding already in the portfolio?
-                var holdingId = await portfolioRepository.CheckIfHoldingInPortfolio();
+                holdingId = await portfolioRepository.CheckIfHoldingInPortfolio();
 
-                // if not, add
-                if (!holdingId.Item1)
+                // if not, add, otherwise update
+                if (holdingId is 0)
                 {
-                    // add to db
                     await portfolioRepository.AddPortfolioHolding();
                 }
                 else
                 {
-                    // if yes, update
                     await portfolioRepository.UpdatePortfolioHolding();
                 }
 

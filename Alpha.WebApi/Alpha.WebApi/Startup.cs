@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Alpha.Common.Interfaces;
+using Alpha.Infrastructure;
 using Alpha.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace Alpha.WebApi
         {
             builder
                 .Services
-                .AddTransient<ITransactionRepository, TransactionRepository>();
+                .AddInfrastructure();
         }
     }
 }

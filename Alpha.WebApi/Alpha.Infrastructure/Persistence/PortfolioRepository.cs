@@ -23,7 +23,7 @@ namespace Alpha.Infrastructure.Persistence
             throw new NotImplementedException();
         }
 
-        public Task<Tuple<bool, int>> CheckIfHoldingInPortfolio()
+        public Task<int> CheckIfHoldingInPortfolio()
         {
             throw new NotImplementedException();
         }

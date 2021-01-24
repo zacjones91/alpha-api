@@ -10,6 +10,6 @@ namespace Alpha.Common.Interfaces
         public Task<bool> AddPortfolioHolding();
         public Task<bool> DeletePortfolioHolding();
         public Task<bool> UpdatePortfolioHolding();
-        public Task<Tuple<bool, int>> CheckIfHoldingInPortfolio();
+        public Task<int> CheckIfHoldingInPortfolio();
     }
 }
