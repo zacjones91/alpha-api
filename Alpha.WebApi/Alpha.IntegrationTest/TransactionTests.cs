@@ -46,7 +46,7 @@ namespace Alpha.IntegrationTest
             };
 
             // act
-            var result = await transactionService.AddTransactionAsync(transaction);
+            var result = await transactionService.AddTransactionAsync(transaction, portfolio.Id);
 
             // assert
             Assert.True(result);

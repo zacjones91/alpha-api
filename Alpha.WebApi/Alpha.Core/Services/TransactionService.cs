@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Alpha.Common.DTOs;
 using Alpha.Common.Interfaces;
 using Alpha.Common.Models;
 
@@ -20,7 +21,7 @@ namespace Alpha.Core.Services
             this.portfolioRepository = portfolioRepository;
         }
 
-        public async Task<bool> AddTransactionAsync(Transaction transaction)
+        public async Task<bool> AddTransactionAsync(Transaction transaction, int portfolioId)
         {
             // this probably needs to be redesigned to be wrapped in a database transaction
             try
@@ -28,29 +29,31 @@ namespace Alpha.Core.Services
                 int securityId;
                 int holdingId;
 
-                // check if this security is already in the database
                 securityId = await securityRepository.CheckSecurityExists(transaction.Symbol);
 
-                // if no, add it
                 if (securityId is 0)
                 {
                     securityId = await securityRepository.AddSecurity(transaction.Symbol, transaction.Description);
                 }
 
-                // add the transaction
                 await transactionRepository.AddTransactionAsync(transaction, securityId);
 
-                // is this holding already in the portfolio?
                 holdingId = await portfolioRepository.CheckIfHoldingInPortfolio();
 
-                // if not, add, otherwise update
+                var position = new PortfolioPositionDto()
+                {
+                    PortfolioId = portfolioId,
+                    SecurityId = securityId,
+                    Shares = transaction.Quantity
+                };
+
                 if (holdingId is 0)
                 {
-                    await portfolioRepository.AddPortfolioHolding();
+                    await portfolioRepository.AddPortfolioPosition(position);
                 }
                 else
                 {
-                    await portfolioRepository.UpdatePortfolioHolding();
+                    await portfolioRepository.UpdatePortfolioPosition(position, transaction.Action, holdingId);
                 }
 
                 return true;

@@ -8,7 +8,7 @@ namespace Alpha.Common.Interfaces
 {
     public interface ITransactionService
     {
-        public Task<bool> AddTransactionAsync(Transaction transaction);
+        public Task<bool> AddTransactionAsync(Transaction transaction, int portfolioId);
         public Task<List<Transaction>> GetTransactionsAsync();
         public Task<bool> DeleteTransactionAsync();
     }

@@ -62,7 +62,7 @@ namespace Alpha.Infrastructure.Persistence
 
             using var connection = connectionFactory.GetDbConnection();
 
-            var result = connection.Query<Transaction>(sql: sql, commandType: CommandType.Text, param: p);
+            var result = await connection.QueryAsync<Transaction>(sql: sql, commandType: CommandType.Text, param: p);
 
             return result.ToList();
         }
